@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import {
     View,
     Text,
@@ -41,7 +41,7 @@ export default class NavigationBar extends Component {
         }
     }
     render(){
-        let status = <View style = {[styles.statusBar, this.props.statusBar]}><StatusBar {...this.props.statusBar}/></View>
+        let status = <View style = {styles.statusBar}><StatusBar {...this.props.statusBar}/></View>
         let titleView = this.props.titleView ? this.props.titleView : <Text style = {styles.title}>{this.props.title}</Text>
         let content=<View style = {styles.navBar}>
             {this.props.leftButton}
@@ -52,6 +52,7 @@ export default class NavigationBar extends Component {
         </View>
         return (
             <View style = {[styles.container, this.props.style]}>
+                {status}
                 {content}
             </View>
         )
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
         height: Platform.OS === 'ios' ? STATUS_BAR_HEIGHT : 0,
     },
     container: {
-        backgroundColor: 'gray'
+        backgroundColor: '#2196F3',
     },
     navBar: {
         justifyContent: 'space-between',

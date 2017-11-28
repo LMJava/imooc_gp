@@ -13,19 +13,13 @@ import {
   Image,
   View
 } from 'react-native';
-import { StackNavigator } from 'react-navigation';
 import TabNavigator from 'react-native-tab-navigator';
-// import Boy from './Boy'
-// import NavigationBar from './NavigationBar'
-import ListView from './ListViewCmt'
-import Fetch from './FetchTest'
+import Popular from './PopularPage';
+// import { StackNavigator } from 'react-navigation';
+// import NavigationBar from '../common/NavigationBar'
+// import ListView from './ListViewCmt'
+// import Fetch from './FetchTest'
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' +
-    'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
 export default class App extends Component {
   constructor(props){
     super(props);
@@ -36,36 +30,36 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {/*<TabNavigator>
+        <TabNavigator>
           <TabNavigator.Item
             selected={this.state.selectedTab === 'tb_popular'}
             selectedTitleStyle={{color:'red'}}
             title="最热"
-            renderIcon={() => <Image style={styles.image} source={require('./res/images/ic_polular.png')} />}
-            renderSelectedIcon={() => <Image style={[styles.image, {tintColor: 'red'}]} source={require('./res/images/ic_polular.png')} />}
+            renderIcon={() => <Image style={styles.image} source={require('../../res/images/ic_polular.png')} />}
+            renderSelectedIcon={() => <Image style={[styles.image, {tintColor: 'red'}]} source={require('../../res/images/ic_polular.png')} />}
             badgeText="1"
             onPress={() => this.setState({ selectedTab: 'tb_popular' })}>
             <View style={styles.tb_popular}>
-              <ListView/>
+              <Popular/>
             </View>
           </TabNavigator.Item>
           <TabNavigator.Item
             selected={this.state.selectedTab === 'tb_trending'}
             selectedTitleStyle={{color:'orange'}}
             title="趋势"
-            renderIcon={() => <Image style={styles.image} source={require('./res/images/ic_trending.png')} />}
-            renderSelectedIcon={() => <Image style={[styles.image, {tintColor: 'orange'}]} source={require('./res/images/ic_trending.png')} />}
+            renderIcon={() => <Image style={styles.image} source={require('../../res/images/ic_trending.png')} />}
+            renderSelectedIcon={() => <Image style={[styles.image, {tintColor: 'orange'}]} source={require('../../res/images/ic_trending.png')} />}
             onPress={() => this.setState({ selectedTab: 'tb_trending' })}>
             <View style={styles.tb_trending}>
-              <Fetch/>
+              {/* <Fetch/> */}
             </View>
           </TabNavigator.Item>
           <TabNavigator.Item
             selected={this.state.selectedTab === 'tb_favorite'}
             selectedTitleStyle={{color:'yellow'}}
             title="收藏"
-            renderIcon={() => <Image style={styles.image} source={require('./res/images/ic_polular.png')} />}
-            renderSelectedIcon={() => <Image style={[styles.image, {tintColor: 'yellow'}]} source={require('./res/images/ic_polular.png')} />}
+            renderIcon={() => <Image style={styles.image} source={require('../../res/images/ic_favorite.png')} />}
+            renderSelectedIcon={() => <Image style={[styles.image, {tintColor: 'yellow'}]} source={require('../../res/images/ic_favorite.png')} />}
             onPress={() => this.setState({ selectedTab: 'tb_favorite' })}>
             <View style={styles.tb_favorite}></View>
           </TabNavigator.Item>
@@ -73,12 +67,12 @@ export default class App extends Component {
             selected={this.state.selectedTab === 'tb_my'}
             selectedTitleStyle={{color:'green'}}
             title="我的"
-            renderIcon={() => <Image style={styles.image} source={require('./res/images/ic_trending.png')} />}
-            renderSelectedIcon={() => <Image style={[styles.image, {tintColor: 'green'}]} source={require('./res/images/ic_trending.png')} />}
+            renderIcon={() => <Image style={styles.image} source={require('../../res/images/ic_my.png')} />}
+            renderSelectedIcon={() => <Image style={[styles.image, {tintColor: 'green'}]} source={require('../../res/images/ic_my.png')} />}
             onPress={() => this.setState({ selectedTab: 'tb_my' })}>
             <View style={styles.tb_my}></View>
           </TabNavigator.Item>
-        </TabNavigator> */}
+        </TabNavigator>
       </View>
     );
   }
