@@ -13,7 +13,7 @@ const NAV_BAR_HEIGHT_IOS = 44
 const STATUS_BAR_HEIGHT = 20
 const StatusBarShape = {
     backgroundColor: PropTypes.string,
-    barStyle: PropTypes.oneOf('default', 'light-content', 'dark-content'),
+    barStyle: PropTypes.oneOf(['default', 'light-content', 'dark-content']),
     hidden: PropTypes.bool,
 }
 

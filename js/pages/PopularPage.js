@@ -1,13 +1,18 @@
 import React, { Component } from 'react';
 import {
+    RefreshControl,
+    FlatList,
     TextInput,
     StyleSheet,
     Text,
     Image,
     View
 } from 'react-native';
+import ScrollableTabView, {ScrollableTabBar} from 'react-native-scrollable-tab-view';
 import NavigationBar from '../common/NavigationBar'
 import DataRepository from '../expand/dao/DataRepository'
+import RepositoryCell from '../common/RepositoryCell'
+import LanguageDao, {FLAG_LANGUAGE} from '../expand/dao/LanguageDao'
 
 const URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
@@ -15,49 +20,95 @@ const QUERY_STR = '&sort=stars';
 export default class PopularPage extends Component {
     constructor(props){
         super(props)
-        this.dataRepository = new DataRepository()
         this.state={
-            result: ''
+            languages:[],
         }
+        this.LanguageDao = new LanguageDao(FLAG_LANGUAGE.flag_key)
     }
-    onLoad(){
-        let url = this.getUrl(this.text)
-        this.dataRepository.fetchNetRepository(url)
-            .then(result=>{
-                this.setState({result: JSON.stringify(result)})
-            })
-            .catch(error=>{
-                this.setState({result: JSON.stringify(error)})
-            })
+    componentDidMount(){
+        this.LoadData()
     }
-    getUrl(key){
-        return URL+key+QUERY_STR
+    
+    LoadData(){
+        this.LanguageDao.fetch()
+            .then(result=>this.setState({languages: result}))
+            .catch(error=>console.log(error))
     }
     render(){
+        let content = this.state.languages.length>0 
+            ? <ScrollableTabView
+                tabBarBackgroundColor="#2196F3"
+                tabBarInactiveTextColor='mintcream'
+                tabBarActiveTextColor='white'
+                tabBarUnderlineStyle={{backgroundColor: '#e7e7e7', height: 2}}
+                renderTabBar={() => <ScrollableTabBar/>}
+            >
+                {this.state.languages.map((result, i, arr)=>{
+                    let lan = arr[i]
+                    return lan.checked ? <PopularTab key={i} tabLabel={lan.name} ></PopularTab> : null
+                })}
+            </ScrollableTabView>
+            : null
         return(
-            <View>
+            <View style={styles.container}>
                 <NavigationBar
                     title={'最热'}
                     statusBar = {{backgroundColor: '#2196F3'}}
                 />
-                <Text
-                    onPress={()=>{this.onLoad()}}
-                    style={styles.tips}
-                >获取数据</Text>
-                <TextInput
-                    style={{height: 40, borderWidth: 1}}
-                    onChangeText={text=>this.text=text}
-                />
-                <Text style={{height: 500}}>{this.state.result}</Text>
+                {content}
             </View>
         )
+    }
+}
+class PopularTab extends Component {
+    constructor(props){
+        super(props)
+        this.dataRepository = new DataRepository()
+        this.state={
+            dataSourse: '',
+            isLoading: false,
+        }
+    }
+    componentDidMount(){
+        this.loadData()
+    }
+    loadData(){
+        this.setState({isLoading: true})
+        let url = URL+this.props.tabLabel+QUERY_STR
+        this.dataRepository.fetchNetRepository(url)
+            .then(result=>{
+                this.setState({
+                    dataSourse: result.items,
+                    isLoading: false
+                })
+            })
+            .catch(error=>{
+                console.log(error)
+            })
+    }
+    renderRow(item){
+        return <RepositoryCell data={item}/>
+    }
+    render(){
+        return <View style={{flex: 1}}>
+            <FlatList
+                keyExtractor={(item, index)=>(item+index)}
+                data={this.state.dataSourse}
+                renderItem={(item)=>this.renderRow(item.item)}
+                refreshControl={<RefreshControl
+                    colors={['#2196F3']}
+                    tintColor={'#2196F3'}
+                    title={'Loading...'}
+                    titleColor={'#2196F3'}
+                    refreshing={this.state.isLoading}
+                    onRefresh={()=>this.loadData()}
+                />}
+            /> 
+        </View>
     }
 }
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    tips: {
-        fontSize: 20
     }
 })

@@ -5,18 +5,20 @@ import {
     Image,
     View
 } from 'react-native';
+import DeviceInfo from 'react-native-device-info'
 import {NavigationActions} from "react-navigation"
 import NavigationBar from '../common/NavigationBar'
 
 export default class WelcomePage extends Component {
     componentDidMount(){
+        // alert(DeviceInfo.getVersion())
         this.timer = setTimeout(()=>{
             const resetAction = NavigationActions.reset({
                 index: 0,
                 actions: [NavigationActions.navigate({routeName: "Home"})]
             })
             this.props.navigation.dispatch(resetAction)
-        }, 2000)
+        }, 2.000)
     }
     componentWillUnmount(){
         this.timer && clearTimeout(this.timer)
