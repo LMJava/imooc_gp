@@ -6,6 +6,7 @@
 
 import React, { Component } from 'react';
 import {
+  DeviceEventEmitter,
   TouchableOpacity,
   Platform,
   StyleSheet,
@@ -14,6 +15,7 @@ import {
   View
 } from 'react-native';
 import TabNavigator from 'react-native-tab-navigator';
+import Toast, {DURATION} from 'react-native-easy-toast'
 import Popular from './PopularPage';
 import MyRoute from './my/MyRoute';
 import AsyncStorageTest from '../../AsyncStorageTest';
@@ -30,6 +32,14 @@ export default class App extends Component {
     this.state={
       selectedTab: 'tb_popular'
     }
+  }
+  componentDidMount(){
+    this.listener = DeviceEventEmitter.addListener('showToast', (text)=>{
+      this.toast.show(text, DURATION.LENGTH_LONG)
+    })
+  }
+  componentWillUnmount(){
+    this.listener&&this.listener.remove()
   }
   render() {
     return (
@@ -79,6 +89,7 @@ export default class App extends Component {
             </View>
           </TabNavigator.Item>
         </TabNavigator>
+        <Toast ref={toast=>this.toast = toast} />
       </View>
     );
   }

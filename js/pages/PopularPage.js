@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+    DeviceEventEmitter,
     RefreshControl,
     FlatList,
     TextInput,
@@ -75,12 +76,25 @@ class PopularTab extends Component {
     loadData(){
         this.setState({isLoading: true})
         let url = URL+this.props.tabLabel+QUERY_STR
-        this.dataRepository.fetchNetRepository(url)
+        this.dataRepository.fetchRepository(url)
             .then(result=>{
+                let items = result&&result.items?result.items:result?result:[]
                 this.setState({
-                    dataSourse: result.items,
+                    dataSourse: items,
                     isLoading: false
                 })
+                DeviceEventEmitter.emit('showToast', '显示本地数据')
+                if(result
+                    &&result.update_date
+                    &&!this.dataRepository.checkDate(result.update_date)
+                ) return this.dataRepository.fetchNetRepository(url)
+            })
+            .then(items=>{
+                if(!items || items.length === 0) return
+                this.setState({
+                    dataSourse: items,
+                })
+                DeviceEventEmitter.emit('showToast', '显示网络数据')                
             })
             .catch(error=>{
                 console.log(error)

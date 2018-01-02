@@ -17,22 +17,26 @@ import LanguageDao, {FLAG_LANGUAGE} from '../../expand/dao/LanguageDao'
 export default class CustomKeyPage extends Component {
     constructor(props){
         super(props)
-        this.LanguageDao = new LanguageDao(FLAG_LANGUAGE.flag_key)
+        this.isRemoveKey = this.props.navigation.state.params.isRemoveKey ? true : false
         this.changeValues=[]
         this.state={
             dataArray:[],
         }
     }
     componentDidMount(){
-        this.LoadData()
+        this.LanguageDao = new LanguageDao(FLAG_LANGUAGE.flag_key)
+        this.loadData()
     }
-    LoadData(){
+    loadData(){
         this.LanguageDao.fetch()
             .then(result=>this.setState({dataArray: result}))
             .catch(error=>console.log(error))
     }
     onSave(){
         if(this.changeValues.length!==0){
+            for(let i=0, l=this.changeValues.length;i<l;i++){
+                ArrayUtils.remove(this.state.dataArray, this.changeValues[i])
+            }
             this.LanguageDao.save(this.state.dataArray)
         }
         this.props.navigation.goBack()
@@ -84,7 +88,7 @@ export default class CustomKeyPage extends Component {
                 style={{flex: 1, padding: 10}}
                 onClick = {()=>this.onClick(data)}
                 leftText = {leftText}
-                isChecked={data.checked}
+                isChecked={this.isRemoveKey ? false : data.checked}
                 checkedImage={<Image 
                     style={{tintColor: '#6495ED'}}
                     source={require('./img/ic_check_box.png')} 
@@ -97,24 +101,18 @@ export default class CustomKeyPage extends Component {
         )
     }
     onClick(data){
-        data.checked=!data.checked
+        if(!this.isRemoveKey) data.checked=!data.checked
         ArrayUtils.updateArray(this.changeValues, data)
     }
     render(){
-        let rightBtn = <TouchableOpacity
-            onPress={()=>this.onSave()}
-        >
-            <View style={{margin: 10}}>
-                <Text style={styles.title}>保存</Text>
-            </View>
-        </TouchableOpacity>
+        let rightButtonTitle=this.isRemoveKey? '移除':'保存'
         return(
             <View style={styles.container}>
                 <NavigationBar
-                    title={'自定义标签'}
+                    title={this.isRemoveKey ? '标签移除' : '自定义标签'}
                     statusBar = {{backgroundColor: '#2196F3'}}
                     leftButton = {ViewUtils.getLeftBtn(()=>this.onBack())}
-                    rightButton = {rightBtn}
+                    rightButton = {ViewUtils.getRightButton(rightButtonTitle,()=>this.onSave())}
                 />
                 <ScrollView>
                     {this.renderView()}

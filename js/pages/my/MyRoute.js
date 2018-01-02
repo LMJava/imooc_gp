@@ -3,6 +3,7 @@ import { StackNavigator } from 'react-navigation'
 
 import MyPage from './MyPage'
 import CustomKeyPage from './CustomKeyPage'
+import SortKeyPage from './SortKeyPage'
 
 export default class MyRoute extends Component {
     constructor(props){
@@ -16,6 +17,9 @@ export default class MyRoute extends Component {
                 },
                 CustomKey: {
                     screen: CustomKeyPage,
+                },
+                SortKey: {
+                    screen: SortKeyPage,
                 }
             },{
                 headerMode: 'none',

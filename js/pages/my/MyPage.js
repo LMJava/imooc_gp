@@ -29,6 +29,25 @@ export default class MyPage extends Component {
                 >
                     自定义标签
                 </Text>
+                <Text
+                    style={styles.tips}
+                    onPress={()=>{
+                        this.props.navigation.navigate('SortKey', { ...this.props })
+                    }}
+                >
+                    标签排序
+                </Text>
+                <Text
+                    style={styles.tips}
+                    onPress={()=>{
+                        this.props.navigation.navigate('CustomKey', { 
+                            ...this.props, 
+                            isRemoveKey: true 
+                        })
+                    }}
+                >
+                    标签移除
+                </Text>
             </View>
         )
     }
@@ -36,5 +55,8 @@ export default class MyPage extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    tips: {
+        fontSize: 29
     }
 })
