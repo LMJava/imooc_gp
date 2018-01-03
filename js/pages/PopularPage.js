@@ -32,7 +32,8 @@ export default class PopularPage extends Component {
     
     LoadData(){
         this.LanguageDao.fetch()
-            .then(result=>this.setState({languages: result}))
+            .then(result=>{
+                if(result) this.setState({languages: result})})
             .catch(error=>console.log(error))
     }
     render(){
@@ -46,7 +47,7 @@ export default class PopularPage extends Component {
             >
                 {this.state.languages.map((result, i, arr)=>{
                     let lan = arr[i]
-                    return lan.checked ? <PopularTab key={i} tabLabel={lan.name} ></PopularTab> : null
+                    return lan.checked ? <PopularTab key={i} tabLabel={lan.name} {...this.props} ></PopularTab> : null
                 })}
             </ScrollableTabView>
             : null
@@ -100,15 +101,21 @@ class PopularTab extends Component {
                 console.log(error)
             })
     }
-    renderRow(item){
-        return <RepositoryCell data={item}/>
+    onSelect(item){
+        this.props.navigation.navigate('ReponsitoryDetail', {item: item})
+    }
+    renderRow(_item){
+        return <RepositoryCell 
+            data={_item}
+            onSelect={()=>this.onSelect(_item)}
+        />
     }
     render(){
         return <View style={{flex: 1}}>
             <FlatList
                 keyExtractor={(item, index)=>(item+index)}
                 data={this.state.dataSourse}
-                renderItem={(item)=>this.renderRow(item.item)}
+                renderItem={({item})=>this.renderRow(item)}
                 refreshControl={<RefreshControl
                     colors={['#2196F3']}
                     tintColor={'#2196F3'}
@@ -123,6 +130,6 @@ class PopularTab extends Component {
 }
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1
     }
 })

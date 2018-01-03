@@ -9,12 +9,17 @@ import { StackNavigator } from 'react-navigation';
 import WelcomePage from './WelcomePage'
 import HomePage from './HomePage'
 
+import ReponsitoryDetail from './ReponsitoryDetail'
+
+import CustomKeyPage from './my/CustomKeyPage'
+import SortKeyPage from './my/SortKeyPage'
+
 
 export default class setup extends Component {
     constructor(props){
         super(props)
         this.state = {
-            ReturnDom: 'Welcome',
+            ReturnDom: 'Home', // 'Welcome',
         };
     }
     render() {
@@ -30,6 +35,17 @@ function indexStackNavigator(type) {
         Home: {
             screen: HomePage,
         },
+
+        ReponsitoryDetail: {
+            screen: ReponsitoryDetail,
+        },
+
+        CustomKey: {
+            screen: CustomKeyPage,
+        },
+        SortKey: {
+            screen: SortKeyPage,
+        }
     },{
         initialRouteName: type,
         headerMode: 'none',

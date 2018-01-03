@@ -17,8 +17,9 @@ import {
 import TabNavigator from 'react-native-tab-navigator';
 import Toast, {DURATION} from 'react-native-easy-toast'
 import Popular from './PopularPage';
-import MyRoute from './my/MyRoute';
+import My from './my/MyPage';
 import AsyncStorageTest from '../../AsyncStorageTest';
+import WebViewTest from '../../WebViewTest';
 
 
 // import { StackNavigator } from 'react-navigation';
@@ -53,9 +54,7 @@ export default class App extends Component {
             renderSelectedIcon={() => <Image style={[styles.image, {tintColor: '#2196F3'}]} source={require('../../res/images/ic_polular.png')} />}
             badgeText="1"
             onPress={() => this.setState({ selectedTab: 'tb_popular' })}>
-            <View style={styles.tb_popular}>
-              <Popular/>
-            </View>
+              <Popular {...this.props}/>
           </TabNavigator.Item>
           <TabNavigator.Item
             selected={this.state.selectedTab === 'tb_trending'}
@@ -64,9 +63,7 @@ export default class App extends Component {
             renderIcon={() => <Image style={styles.image} source={require('../../res/images/ic_trending.png')} />}
             renderSelectedIcon={() => <Image style={[styles.image, {tintColor: '#2196F3'}]} source={require('../../res/images/ic_trending.png')} />}
             onPress={() => this.setState({ selectedTab: 'tb_trending' })}>
-            <View style={styles.tb_trending}>
               <AsyncStorageTest/>
-            </View>
           </TabNavigator.Item>
           <TabNavigator.Item
             selected={this.state.selectedTab === 'tb_favorite'}
@@ -75,7 +72,7 @@ export default class App extends Component {
             renderIcon={() => <Image style={styles.image} source={require('../../res/images/ic_favorite.png')} />}
             renderSelectedIcon={() => <Image style={[styles.image, {tintColor: '#2196F3'}]} source={require('../../res/images/ic_favorite.png')} />}
             onPress={() => this.setState({ selectedTab: 'tb_favorite' })}>
-            <View style={styles.tb_favorite}></View>
+            <WebViewTest />
           </TabNavigator.Item>
           <TabNavigator.Item
             selected={this.state.selectedTab === 'tb_my'}
@@ -85,7 +82,7 @@ export default class App extends Component {
             renderSelectedIcon={() => <Image style={[styles.image, {tintColor: '#2196F3'}]} source={require('../../res/images/ic_my.png')} />}
             onPress={() => this.setState({ selectedTab: 'tb_my' })}>
             <View style={styles.tb_my}>
-              <MyRoute {...this.props}/>
+              <My {...this.props}/>
             </View>
           </TabNavigator.Item>
         </TabNavigator>
