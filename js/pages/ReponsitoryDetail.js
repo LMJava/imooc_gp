@@ -10,15 +10,16 @@ import {
 } from 'react-native'
 import ViewUtils from '../util/ViewUtils'
 import NavigationBar from '../common/NavigationBar'
-const URL = 'http://www.imooc.com'
+
+const TRENDING_URL = 'https://github.com/'
 
 export default class ReponsitoryDetail extends Component {
     constructor(props){
         super(props)
         this.item=this.props.navigation.state.params.item
         this.state={
-            url: this.item.html_url,
-            title: this.item.full_name,
+            url: this.item.html_url ? this.item.html_url : TRENDING_URL + this.item.fullName,
+            title: this.item.full_name ? this.item.full_name : this.item.fullName,
             canGoBack: false
         }
     }

@@ -7,6 +7,7 @@
 		"test": "jest"
 	},
 	"dependencies": {
+		"GitHubTrending": "^3.0.0",
 		"prop-types": "^15.6.0",
 		"react": "16.0.0",
 		"react-native": "0.50.3",
@@ -14,6 +15,7 @@
 		"react-native-deprecated-custom-components": "^0.1.1",
 		"react-native-device-info": "^0.13.0",
 		"react-native-easy-toast": "^1.0.9",
+		"react-native-htmlview": "^0.12.1",
 		"react-native-scrollable-tab-view": "^0.8.0",
 		"react-native-sortable-listview": "^0.2.7",
 		"react-native-tab-navigator": "^0.3.4",

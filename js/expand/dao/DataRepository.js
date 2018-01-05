@@ -1,7 +1,16 @@
 import {
     AsyncStorage,
-} from 'react-native';
+} from 'react-native'
+import GitHubTrending from 'GitHubTrending'
+
+export const FLAG_STOTAGE = {flag_popular: 'popular', flag_trending: 'trending'}
 export default class DataRepository{
+    constructor(flag){
+        this.flag = flag
+        if(flag === FLAG_STOTAGE.flag_trending){
+            this.trending = new GitHubTrending()
+        }
+    }
     fetchRepository(url){
         return new Promise((resolve, reject)=>{
             // 首先获取本地数据
@@ -39,17 +48,29 @@ export default class DataRepository{
     }
     fetchNetRepository(url){
         return new Promise((resolve, reject)=>{
-            fetch(url)
-                .then(response=>response.json())
-                .then(result=>{
-                    if(!result){
-                        reject(new Error('responsedData is null'))
-                        return
-                    }
-                    resolve(result.items)
-                    this.saveRepository(url, result.items)
-                })
-                .catch(error=>reject(error))
+            if(this.flag === FLAG_STOTAGE.flag_trending){
+                this.trending.fetchTrending(url)
+                    .then(result => {
+                        if(!result) {
+                            reject(new Error('responseData is null'))
+                            return
+                        }
+                        this.saveRepository(url, result)
+                        resolve(result)
+                    })
+            } else {
+                fetch(url)
+                    .then(response=>response.json())
+                    .then(result=>{
+                        if(!result){
+                            reject(new Error('responsedData is null'))
+                            return
+                        }
+                        this.saveRepository(url, result.items)
+                        resolve(result.items)
+                    })
+                    .catch(error=>reject(error))
+            }
         })
     }
     saveRepository(url, items, callBack){

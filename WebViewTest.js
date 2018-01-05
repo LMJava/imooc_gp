@@ -54,7 +54,8 @@ export default class WebViewTest extends Component {
                 <TextInput 
                     style={styles.input}
                     defaultValue={URL}
-                    onChangeText={Text=>this.text = text}
+                    onChangeText={text=>this.text = text}
+                    underlineColorAndroid="transparent"
                 />
                 <Text 
                     style={styles.tips}
@@ -88,6 +89,7 @@ const styles = StyleSheet.create({
         height: 40,
         flex: 1,
         borderWidth: 1,
-        margin: 2
+        margin: 2, 
+        padding: 0
     }
 })

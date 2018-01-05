@@ -24,7 +24,7 @@ export default class CustomKeyPage extends Component {
         }
     }
     componentDidMount(){
-        this.LanguageDao = new LanguageDao(FLAG_LANGUAGE.flag_key)
+        this.LanguageDao = new LanguageDao(this.props.navigation.state.params.flag)
         this.loadData()
     }
     loadData(){
@@ -34,8 +34,10 @@ export default class CustomKeyPage extends Component {
     }
     onSave(){
         if(this.changeValues.length!==0){
-            for(let i=0, l=this.changeValues.length;i<l;i++){
-                ArrayUtils.remove(this.state.dataArray, this.changeValues[i])
+            if(this.isRemoveKey){
+                for(let i=0, l=this.changeValues.length;i<l;i++){
+                    ArrayUtils.remove(this.state.dataArray, this.changeValues[i])
+                }
             }
             this.LanguageDao.save(this.state.dataArray)
         }
@@ -106,10 +108,12 @@ export default class CustomKeyPage extends Component {
     }
     render(){
         let rightButtonTitle=this.isRemoveKey? '移除':'保存'
+        let title = this.props.navigation.state.params.flag === FLAG_LANGUAGE.flag_language ? '语言' : '标签'
+        title = this.isRemoveKey ? title + '移除' : '自定义' + title
         return(
             <View style={styles.container}>
                 <NavigationBar
-                    title={this.isRemoveKey ? '标签移除' : '自定义标签'}
+                    title={title}
                     statusBar = {{backgroundColor: '#2196F3'}}
                     leftButton = {ViewUtils.getLeftBtn(()=>this.onBack())}
                     rightButton = {ViewUtils.getRightButton(rightButtonTitle,()=>this.onSave())}

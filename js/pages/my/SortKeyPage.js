@@ -26,7 +26,7 @@ export default class SortKeyPage extends Component {
         }
     }
     componentDidMount(){
-        this.languageDao = new LanguageDao(FLAG_LANGUAGE.flag_key)
+        this.languageDao = new LanguageDao(this.props.navigation.state.params.flag)
         this.loadData()
     }
     loadData(){
@@ -80,10 +80,11 @@ export default class SortKeyPage extends Component {
         this.originalCheckArray = ArrayUtils.clone(checkedArray)
     }
     render(){
+        let title = this.props.navigation.state.params.flag === FLAG_LANGUAGE.flag_language ? '语言排序' : '标签排序'
         return(
             <View style={styles.container}>
                 <NavigationBar
-                    title={'标签排序'}
+                    title={title}
                     statusBar = {{backgroundColor: '#2196F3'}}
                     leftButton = {ViewUtils.getLeftBtn(()=>this.onBack())}
                     rightButton = {ViewUtils.getRightButton('保存', ()=>this.onSave())}

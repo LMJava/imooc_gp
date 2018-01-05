@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import ScrollableTabView, {ScrollableTabBar} from 'react-native-scrollable-tab-view';
 import NavigationBar from '../common/NavigationBar'
-import DataRepository from '../expand/dao/DataRepository'
+import DataRepository, {FLAG_STOTAGE} from '../expand/dao/DataRepository'
 import RepositoryCell from '../common/RepositoryCell'
 import LanguageDao, {FLAG_LANGUAGE} from '../expand/dao/LanguageDao'
 
@@ -65,7 +65,7 @@ export default class PopularPage extends Component {
 class PopularTab extends Component {
     constructor(props){
         super(props)
-        this.dataRepository = new DataRepository()
+        this.dataRepository = new DataRepository(FLAG_STOTAGE.flag_popular)
         this.state={
             dataSourse: '',
             isLoading: false,
@@ -76,7 +76,7 @@ class PopularTab extends Component {
     }
     loadData(){
         this.setState({isLoading: true})
-        let url = URL+this.props.tabLabel+QUERY_STR
+        let url = this.getFetchUrl(this.props.tabLabel)
         this.dataRepository.fetchRepository(url)
             .then(result=>{
                 let items = result&&result.items?result.items:result?result:[]
@@ -100,6 +100,9 @@ class PopularTab extends Component {
             .catch(error=>{
                 console.log(error)
             })
+    }
+    getFetchUrl(key){
+        return URL+key+QUERY_STR
     }
     onSelect(item){
         this.props.navigation.navigate('ReponsitoryDetail', {item: item})
