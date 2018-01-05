@@ -11,12 +11,16 @@ import {
 } from 'react-native';
 import ScrollableTabView, {ScrollableTabBar} from 'react-native-scrollable-tab-view';
 import NavigationBar from '../common/NavigationBar'
-import DataRepository, {FLAG_STOTAGE} from '../expand/dao/DataRepository'
 import RepositoryCell from '../common/RepositoryCell'
+import DataRepository, {FLAG_STOTAGE} from '../expand/dao/DataRepository'
 import LanguageDao, {FLAG_LANGUAGE} from '../expand/dao/LanguageDao'
+import FavoriteDao, {} from '../expand/dao/FavoriteDao'
+import ProjectModel from '../model/ProjectModel'
+import Utils from '../util/Utils'
 
 const URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
+let favoriteDao = new FavoriteDao(FLAG_STOTAGE.flag_popular)
 
 export default class PopularPage extends Component {
     constructor(props){
@@ -69,21 +73,47 @@ class PopularTab extends Component {
         this.state={
             dataSourse: '',
             isLoading: false,
+            favoriteKeys: []
         }
     }
     componentDidMount(){
         this.loadData()
+    }
+    getFavoriteKeys(){
+        favoriteDao.getFavoriteKeys()
+            .then(keys=>{
+                if(keys){
+                    this.updateState({favoriteKeys: keys})
+                }
+                this.flushFavoriteState()
+            })
+            .catch(()=>this.flushFavoriteState())
+    }
+    /**
+     * 更新Project Item Favorite状态
+     * 
+     * @memberof PopularTab
+     */
+    flushFavoriteState(){
+        let projectModels = [],
+            items = this.items,
+            i = 0,
+            len = items.length
+        for(i, len; i < len; i++){
+            projectModels.push(new ProjectModel(items[i], Utils.checkFavorite(items[i], this.state.favoriteKeys)))
+        }
+        this.updateState({
+            dataSourse: projectModels,
+            isLoading: false
+        })
     }
     loadData(){
         this.setState({isLoading: true})
         let url = this.getFetchUrl(this.props.tabLabel)
         this.dataRepository.fetchRepository(url)
             .then(result=>{
-                let items = result&&result.items?result.items:result?result:[]
-                this.setState({
-                    dataSourse: items,
-                    isLoading: false
-                })
+                this.items = result&&result.items?result.items:result?result:[]
+                this.getFavoriteKeys()
                 DeviceEventEmitter.emit('showToast', '显示本地数据')
                 if(result
                     &&result.update_date
@@ -92,25 +122,46 @@ class PopularTab extends Component {
             })
             .then(items=>{
                 if(!items || items.length === 0) return
-                this.setState({
-                    dataSourse: items,
-                })
+                this.items = items
+                this.getFavoriteKeys()
                 DeviceEventEmitter.emit('showToast', '显示网络数据')                
             })
             .catch(error=>{
                 console.log(error)
+                this.updateState({
+                    isLoading: false
+                })
             })
+    }
+    updateState(dic){
+        if(!this)return
+        this.setState(dic)
     }
     getFetchUrl(key){
         return URL+key+QUERY_STR
     }
-    onSelect(item){
-        this.props.navigation.navigate('ReponsitoryDetail', {item: item})
+    onSelect(_projectModel){
+        this.props.navigation.navigate('ReponsitoryDetail', {projectModel: _projectModel})
     }
-    renderRow(_item){
+    /**
+     * favoriteIcon的单击回调函数
+     * 
+     * @param {any} _item 
+     * @param {any} _isFavorite 
+     * @memberof PopularTab
+     */
+    onFavorite(_item, _isFavorite){
+        if(_isFavorite){
+            favoriteDao.saveFavoriteItem(_item.id.toString(), JSON.stringify(_item))
+        } else {
+            favoriteDao.removeFavoriteItem(_item.id.toString())
+        }
+    }
+    renderRow(_projectModel){
         return <RepositoryCell 
-            data={_item}
-            onSelect={()=>this.onSelect(_item)}
+            projectModel={_projectModel}
+            onSelect={()=>this.onSelect(_projectModel)}
+            onFavorite={(item, isFavorite)=>this.onFavorite(item, isFavorite)}
         />
     }
     render(){

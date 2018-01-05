@@ -16,7 +16,7 @@ const TRENDING_URL = 'https://github.com/'
 export default class ReponsitoryDetail extends Component {
     constructor(props){
         super(props)
-        this.item=this.props.navigation.state.params.item
+        this.item=this.props.navigation.state.params.projectModel.item
         this.state={
             url: this.item.html_url ? this.item.html_url : TRENDING_URL + this.item.fullName,
             title: this.item.full_name ? this.item.full_name : this.item.fullName,
