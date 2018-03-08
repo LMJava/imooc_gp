@@ -3,11 +3,12 @@ import {
 } from 'react-native'
 import GitHubTrending from 'GitHubTrending'
 
-export const FLAG_STOTAGE = {flag_popular: 'popular', flag_trending: 'trending'}
+export var FLAG_STORAGE = {flag_popular: 'popular', flag_trending: 'trending', flag_my: 'my'}
+
 export default class DataRepository{
     constructor(flag){
         this.flag = flag
-        if(flag === FLAG_STOTAGE.flag_trending){
+        if(flag === FLAG_STORAGE.flag_trending){
             this.trending = new GitHubTrending()
         }
     }
@@ -48,7 +49,7 @@ export default class DataRepository{
     }
     fetchNetRepository(url){
         return new Promise((resolve, reject)=>{
-            if(this.flag === FLAG_STOTAGE.flag_trending){
+            if(this.flag === FLAG_STORAGE.flag_trending){
                 this.trending.fetchTrending(url)
                     .then(result => {
                         if(!result) {

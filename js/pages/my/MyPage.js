@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+    TouchableOpacity,
     RefreshControl,
     FlatList,
     TextInput,
@@ -23,75 +24,56 @@ export default class MyPage extends Component {
                     title={'我的'}
                     statusBar = {{backgroundColor: '#2196F3'}}
                 />
-                <Text
-                    style={styles.tips}
-                    onPress={()=>{
-                        this.props.navigation.navigate('CustomKey', { 
-                            ...this.props, 
-                            flag: FLAG_LANGUAGE.flag_key
-                        })
-                    }}
+                <TouchableOpacity
+                    onPress={()=> this.props.navigation.navigate('CustomKey', { 
+                        ...this.props, 
+                        flag: FLAG_LANGUAGE.flag_key
+                    })}
                 >
-                    自定义标签
-                </Text>
-                <Text
-                    style={styles.tips}
-                    onPress={()=>{
-                        this.props.navigation.navigate('SortKey', { 
-                            ...this.props, 
-                            flag: FLAG_LANGUAGE.flag_key
-                        })
-                    }}
+                    <Text style={[styles.tips, {marginTop: 10}]}>自定义标签</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={()=> this.props.navigation.navigate('SortKey', { 
+                        ...this.props, 
+                        flag: FLAG_LANGUAGE.flag_key
+                    })}
                 >
-                    标签排序
-                </Text>
-                <Text
-                    style={styles.tips}
-                    onPress={()=>{
-                        this.props.navigation.navigate('CustomKey', { 
-                            ...this.props, 
-                            flag: FLAG_LANGUAGE.flag_key, 
-                            isRemoveKey: true 
-                        })
-                    }}
+                    <Text style={styles.tips}>标签排序</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={()=> this.props.navigation.navigate('CustomKey', { 
+                        ...this.props, 
+                        flag: FLAG_LANGUAGE.flag_key, 
+                        isRemoveKey: true 
+                    })}
                 >
-                    标签移除
-                </Text>
-                <Text
-                    style={styles.tips}
-                    onPress={()=>{
-                        this.props.navigation.navigate('CustomKey', { 
-                            ...this.props, 
-                            flag: FLAG_LANGUAGE.flag_language
-                        })
-                    }}
+                    <Text style={styles.tips}>标签移除</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={()=> this.props.navigation.navigate('CustomKey', { 
+                        ...this.props, 
+                        flag: FLAG_LANGUAGE.flag_language
+                    })}
                 >
-                    自定义语言
-                </Text>
-                
-                <Text
-                    style={styles.tips}
-                    onPress={()=>{
-                        this.props.navigation.navigate('SortKey', { 
-                            ...this.props, 
-                            flag: FLAG_LANGUAGE.flag_language 
-                        })
-                    }}
+                    <Text style={styles.tips}>自定义语言</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={()=> this.props.navigation.navigate('SortKey', { 
+                        ...this.props, 
+                        flag: FLAG_LANGUAGE.flag_language 
+                    })}
                 >
-                    语言排序
-                </Text>
-                <Text
-                    style={styles.tips}
-                    onPress={()=>{
-                        this.props.navigation.navigate('CustomKey', { 
-                            ...this.props, 
-                            flag: FLAG_LANGUAGE.flag_language, 
-                            isRemoveKey: true 
-                        })
-                    }}
+                    <Text style={styles.tips}>语言排序</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={()=> this.props.navigation.navigate('CustomKey', { 
+                        ...this.props, 
+                        flag: FLAG_LANGUAGE.flag_language, 
+                        isRemoveKey: true 
+                    })}
                 >
-                    语言移除
-                </Text>
+                    <Text style={styles.tips}>语言移除</Text>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -101,6 +83,11 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     tips: {
-        fontSize: 29
+        padding: 15,
+        color: '#333',
+        fontSize: 12,
+        backgroundColor: '#FFF',
+        borderBottomWidth: .5,
+        borderBottomColor: '#E5E5E5'
     }
 })

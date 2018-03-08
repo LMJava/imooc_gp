@@ -16,13 +16,13 @@ import {
 } from 'react-native';
 import TabNavigator from 'react-native-tab-navigator';
 import Toast, {DURATION} from 'react-native-easy-toast'
-import Popular from './PopularPage';
+import PopularPage from './PopularPage';
 import TrendingPage from './TrendingPage';
+import FavoritePage from './FavoritePage';
 import My from './my/MyPage';
 import AsyncStorageTest from '../../AsyncStorageTest';
 import WebViewTest from '../../WebViewTest';
 import TrendingTest from '../../TrendingTest';
-import PopularPage from './PopularPage';
 
 // import { StackNavigator } from 'react-navigation';
 // import NavigationBar from '../common/NavigationBar'
@@ -62,7 +62,7 @@ export default class App extends Component {
         <TabNavigator>
           {this._renderTab(PopularPage, 'tb_popular', '最热', require('../../res/images/ic_polular.png'))}
           {this._renderTab(TrendingPage, 'tb_trending', '趋势', require('../../res/images/ic_trending.png'))}
-          {this._renderTab(WebViewTest, 'tb_favorite', '收藏', require('../../res/images/ic_favorite.png'))}
+          {this._renderTab(FavoritePage, 'tb_favorite', '收藏', require('../../res/images/ic_favorite.png'))}
           {this._renderTab(My, 'tb_my', '我的', require('../../res/images/ic_my.png'))}
         </TabNavigator>
         <Toast ref={toast=>this.toast = toast} />

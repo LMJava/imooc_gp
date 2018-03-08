@@ -5,13 +5,11 @@ import {
     Image,
     View
 } from 'react-native';
-import DeviceInfo from 'react-native-device-info'
 import {NavigationActions} from "react-navigation"
 import NavigationBar from '../common/NavigationBar'
 
 export default class WelcomePage extends Component {
     componentDidMount(){
-        // alert(DeviceInfo.getVersion())
         this.timer = setTimeout(()=>{
             const resetAction = NavigationActions.reset({
                 index: 0,

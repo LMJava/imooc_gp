@@ -12,15 +12,16 @@ import {
 import ScrollableTabView, {ScrollableTabBar} from 'react-native-scrollable-tab-view';
 import NavigationBar from '../common/NavigationBar'
 import RepositoryCell from '../common/RepositoryCell'
-import DataRepository, {FLAG_STOTAGE} from '../expand/dao/DataRepository'
+import DataRepository, {FLAG_STORAGE} from '../expand/dao/DataRepository'
 import LanguageDao, {FLAG_LANGUAGE} from '../expand/dao/LanguageDao'
-import FavoriteDao, {} from '../expand/dao/FavoriteDao'
+import FavoriteDao from '../expand/dao/FavoriteDao'
 import ProjectModel from '../model/ProjectModel'
 import Utils from '../util/Utils'
 
 const URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
-let favoriteDao = new FavoriteDao(FLAG_STOTAGE.flag_popular)
+let favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular)
+var dataRepository = new DataRepository(FLAG_STORAGE.flag_popular)
 
 export default class PopularPage extends Component {
     constructor(props){
@@ -69,7 +70,7 @@ export default class PopularPage extends Component {
 class PopularTab extends Component {
     constructor(props){
         super(props)
-        this.dataRepository = new DataRepository(FLAG_STOTAGE.flag_popular)
+        this.isFavoriteChanged = false
         this.state={
             dataSourse: '',
             isLoading: false,
@@ -78,6 +79,21 @@ class PopularTab extends Component {
     }
     componentDidMount(){
         this.loadData()
+        this.listener = DeviceEventEmitter.addListener('favoriteChanged_popular', ()=>{
+            this.isFavoriteChanged = true
+        })
+    }
+    componentWillUnmount(){
+        this.listener && this.listener.remove()
+    }
+    componentWillReceiveProps(){
+        if(this.isFavoriteChanged){
+            this.isFavoriteChanged = false
+            this.getFavoriteKeys()
+        }
+    }
+    onUpdateFavorite() {
+        this.getFavoriteKeys();
     }
     getFavoriteKeys(){
         favoriteDao.getFavoriteKeys()
@@ -110,15 +126,15 @@ class PopularTab extends Component {
     loadData(){
         this.setState({isLoading: true})
         let url = this.getFetchUrl(this.props.tabLabel)
-        this.dataRepository.fetchRepository(url)
+        dataRepository.fetchRepository(url)
             .then(result=>{
                 this.items = result&&result.items?result.items:result?result:[]
                 this.getFavoriteKeys()
                 DeviceEventEmitter.emit('showToast', '显示本地数据')
                 if(result
                     &&result.update_date
-                    &&!this.dataRepository.checkDate(result.update_date)
-                ) return this.dataRepository.fetchNetRepository(url)
+                    &&!dataRepository.checkDate(result.update_date)
+                ) return dataRepository.fetchNetRepository(url)
             })
             .then(items=>{
                 if(!items || items.length === 0) return
@@ -141,7 +157,12 @@ class PopularTab extends Component {
         return URL+key+QUERY_STR
     }
     onSelect(_projectModel){
-        this.props.navigation.navigate('ReponsitoryDetail', {projectModel: _projectModel})
+        this.props.navigation.navigate('ReponsitoryDetail', {
+            projectModel: _projectModel,
+            flag: FLAG_STORAGE.flag_popular,
+            ...this.props,
+            onUpdateFavorite: ()=>this.onUpdateFavorite(),
+        })
     }
     /**
      * favoriteIcon的单击回调函数

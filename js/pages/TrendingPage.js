@@ -13,12 +13,15 @@ import {
 import GitHubTrending from 'GitHubTrending'
 import ScrollableTabView, {ScrollableTabBar} from 'react-native-scrollable-tab-view';
 
-import DataRepository, {FLAG_STOTAGE} from '../expand/dao/DataRepository'
+import DataRepository, {FLAG_STORAGE} from '../expand/dao/DataRepository'
 import LanguageDao, {FLAG_LANGUAGE} from '../expand/dao/LanguageDao'
+import FavoriteDao from '../expand/dao/FavoriteDao'
+import ProjectModel from '../model/ProjectModel'
 import NavigationBar from '../common/NavigationBar'
 import TrendingCell from '../common/TrendingCell'
 import Popover from '../common/Popover'
 import TimeSpan from '../model/TimeSpan';
+import Utils from '../util/Utils'
 
 let timeSpanTextArray = [
     new TimeSpan('今 天', 'since=daily'),
@@ -26,6 +29,8 @@ let timeSpanTextArray = [
     new TimeSpan('本 月', 'since=monthly')
 ]
 const API_URL = 'https://github.com/trending/'
+let favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending)
+var dataRepository = new DataRepository(FLAG_STORAGE.flag_trending)
 
 export default class TrendingPage extends Component {
     constructor(props){
@@ -39,20 +44,6 @@ export default class TrendingPage extends Component {
         }
         this.LanguageDao = new LanguageDao(FLAG_LANGUAGE.flag_language)
     }
-    // onLoad() {
-    //     let url = API_URL + this.text
-    //     this.dataRepository.fetchRepository(url)
-    //         .then(result => {
-    //             this.setState({
-    //                 result: JSON.stringify(result)
-    //             })
-    //         })
-    //         .catch(error => {
-    //             this.setState({
-    //                 result: JSON.stringify(error)
-    //             })
-    //         })
-    // }
     componentDidMount(){
         this.LoadData()
     }
@@ -160,19 +151,61 @@ export default class TrendingPage extends Component {
 class TrendingTab extends Component {
     constructor(props){
         super(props)
-        this.dataRepository = new DataRepository(FLAG_STOTAGE.flag_trending)
+        this.isFavoriteChanged = false
         this.state={
             dataSourse: '',
             isLoading: false,
+            favoriteKeys: [],
         }
     }
+    
     componentDidMount(){
         this.loadData(this.props.timeSpan, true)
+        this.listener = DeviceEventEmitter.addListener('favoriteChanged_trending', ()=>{
+            this.isFavoriteChanged = true
+        })
+    }
+    componentWillUnmount(){
+        this.listener && this.listener.remove()
     }
     componentWillReceiveProps(nextProps){
         if(nextProps.timeSpan!==this.props.timeSpan){
             this.loadData(nextProps.timeSpan)
+        }else if(this.isFavoriteChanged){
+            this.isFavoriteChanged = false
+            this.getFavoriteKeys()
         }
+    }
+    onUpdateFavorite() {
+        this.getFavoriteKeys();
+    }
+    getFavoriteKeys(){
+        favoriteDao.getFavoriteKeys()
+            .then(keys=>{
+                if(keys){
+                    this.updateState({favoriteKeys: keys})
+                }
+                this.flushFavoriteState()
+            })
+            .catch(()=>this.flushFavoriteState())
+    }
+    /**
+     * 更新Project Item Favorite状态
+     * 
+     * @memberof PopularTab
+     */
+    flushFavoriteState(){
+        let projectModels = [],
+            items = this.items,
+            i = 0,
+            len = items.length
+        for(i, len; i < len; i++){
+            projectModels.push(new ProjectModel(items[i], Utils.checkFavorite(items[i], this.state.favoriteKeys)))
+        }
+        this.updateState({
+            dataSourse: projectModels,
+            isLoading: false
+        })
     }
     onRefresh(){
         this.loadData(this.props.timeSpan, true)
@@ -180,25 +213,19 @@ class TrendingTab extends Component {
     loadData(timeSpan, isRefresh){
         this.updateState({isLoading: true})
         let url = this.getFetchUrl(this.props.tabLabel, timeSpan)
-        this.dataRepository.fetchRepository(url)
+        dataRepository.fetchRepository(url)
             .then(result=>{
-                let items = result&&result.items?result.items:result?result:[]
-                this.updateState({
-                    dataSourse: items,
-                    isLoading: false
-                })
-                DeviceEventEmitter.emit('showToast', '显示本地数据')
-                if(result
+                this.items = result&&result.items?result.items:result?result:[]
+                this.getFavoriteKeys()
+                if(!this.items || isRefresh && result
                     &&result.update_date
-                    &&!this.dataRepository.checkDate(result.update_date)
-                ) return this.dataRepository.fetchNetRepository(url)
+                    &&!dataRepository.checkDate(result.update_date)
+                ) return dataRepository.fetchNetRepository(url)
             })
             .then(items=>{
                 if(!items || items.length === 0) return
-                this.updateState({
-                    dataSourse: items,
-                })
-                DeviceEventEmitter.emit('showToast', '显示网络数据')                
+                this.items = items
+                this.getFavoriteKeys()
             })
             .catch(error=>{
                 console.log(error)
@@ -214,13 +241,42 @@ class TrendingTab extends Component {
     getFetchUrl(category, timeSpan){
         return API_URL+category+'?'+timeSpan.searchText
     }
-    onSelect(item){
-        this.props.navigation.navigate('ReponsitoryDetail', {item: item})
+    onSelect(_projectModel){
+        this.props.navigation.navigate('ReponsitoryDetail', {
+            projectModel: _projectModel,
+            flag: FLAG_STORAGE.flag_trending,
+            ...this.props,
+            onUpdateFavorite: ()=>this.onUpdateFavorite(),
+        })
     }
-    renderRow(_item){
+    /**
+     * favoriteIcon的单击回调函数
+     * 
+     * @param {any} _item 
+     * @param {any} _isFavorite 
+     * @memberof PopularTab
+     */
+    onFavorite(_item, _isFavorite){
+        if(_isFavorite){
+            favoriteDao.saveFavoriteItem(_item.fullName, JSON.stringify(_item))
+        } else {
+            favoriteDao.removeFavoriteItem(_item.fullName)
+        }
+    }
+    renderRow(projectModel){
         return <TrendingCell 
-            data={_item}
-            onSelect={()=>this.onSelect(_item)}
+            key={projectModel.item.fullName}
+            theme={this.state.theme}
+            projectModel={projectModel}
+            // onSelect={()=>ActionUtils.onSelectRepository({
+            //     projectModel: projectModel,
+            //     flag: FLAG_STORAGE.flag_trending,
+            //     ...this.props,
+            //     onUpdateFavorite: ()=>this.onUpdateFavorite(),
+            // })}
+            // onFavorite={(item, isFavorite)=>ActionUtils.onFavorite(favoriteDao, item, isFavorite, FLAG_STORAGE.flag_trending)}
+            onSelect={()=>this.onSelect(projectModel)}
+            onFavorite={(item, isFavorite)=>this.onFavorite(item, isFavorite)}
         />
     }
     render(){
